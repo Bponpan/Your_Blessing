@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Blessing</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400&family=Quicksand:wght@400;500&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: 'Quicksand', sans-serif;
+            background-color: #fdfcf0;
+        }
+
+        .container { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+
+        /* --- Fairy Lights (Pastel Tone) --- */
+        .light-rope {
+            position: absolute;
+            top: -15px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            padding: 0;
+            list-style: none;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .light-rope li {
+            width: 10px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 10px;
+            animation: twinkle 2s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.4; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* --- Snow Effect (Colorful Pastel) --- */
+        .snow-wrapper {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(105vh) rotate(360deg); }
+        }
+
+        /* --- Page 1 (Cover) --- */
+        #page1 {
+            position: absolute;
+            width: 100%; height: 100%;
+            background-color: #FFF9F0;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 5;
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .title-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 8vw; color: #7A8D80;
+            letter-spacing: 1.5vw; text-align: center;
+            line-height: 1.2; margin-bottom: 5vh;
+        }
+
+        .open-btn {
+            background-color: #FFD1DC; color: #7A8D80;
+            border: 2px solid #F8C8DC; padding: 15px 60px;
+            font-size: 20px; border-radius: 30px;
+            cursor: pointer; font-weight: 500;
+            transition: 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .open-btn:hover { background-color: #FFC0CB; transform: translateY(-3px); }
+
+        /* --- Page 2 (Inside) --- */
+        #page2 {
+            position: absolute;
+            width: 100%; height: 100%;
+            background-color: #FFE5E5;
+            display: flex; justify-content: center;
+            align-items: center; padding: 5% 10%;
+            z-index: 1;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 40px; left: 30px;
+            width: 45px; height: 45px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.3s;
+            z-index: 200;
+        }
+
+        .back-btn::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-left: 2px solid #7A8D80;
+            border-bottom: 2px solid #7A8D80;
+            transform: rotate(45deg);
+            margin-left: 3px;
+        }
+
+        .message-box {
+            text-align: center;
+            color: #6B705C;
+            font-size: 2vw; line-height: 1.8;
+            max-width: 850px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            opacity: 0; transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        .show-text { opacity: 1; transform: translateY(0); }
+        .hidden { transform: translateY(-100%); }
+
+        @media (max-width: 768px) {
+            .message-box { font-size: 18px; padding: 20px; }
+            .title-text { font-size: 14vw; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <ul class="light-rope" id="lights"></ul>
+        <div class="snow-wrapper" id="snow-field"></div>
+
+        <div id="page1">
+            <h1 class="title-text">Your<br>Blessing</h1>
+            <button class="open-btn" onclick="openCard()">Open</button>
+        </div>
+
+        <div id="page2">
+            <div class="back-btn" onclick="closeCard()"></div>
+            <div class="message-box" id="wish-text"></div>
+        </div>
+    </div>
+
+    <script>
+        function createLights() {
+            const rope = document.getElementById('lights');
+            const lightCount = Math.floor(window.innerWidth / 45); 
+            for (let i = 0; i < lightCount; i++) {
+                const li = document.createElement('li');
+                rope.appendChild(li);
+            }
+        }
+
+        function createSnow() {
+            const snowField = document.getElementById('snow-field');
+            // รายการสีพาสเทล
+            const colors = ['#FFB7B2', '#B2E2F2', '#B2F2BB', '#FDFD96', '#FFFFFF', '#E0BBE4'];
+            
+            for (let i = 0; i < 60; i++) {
+                const snow = document.createElement('div');
+                snow.className = 'snowflake';
+                const size = Math.random() * 5 + 3 + 'px';
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                snow.style.width = size;
+                snow.style.height = size;
+                snow.style.backgroundColor = randomColor;
+                snow.style.left = Math.random() * 100 + 'vw';
+                snow.style.animationDuration = Math.random() * 4 + 4 + 's';
+                snow.style.animationDelay = Math.random() * 5 + 's';
+                // เพิ่มความฟุ้งให้หิมะดูนุ่มนวล
+                snow.style.filter = 'blur(1px)';
+                snowField.appendChild(snow);
+            }
+        }
+
+        const wishes = [
+            "Merry Christmas! May your days be as sweet and gentle as these pastel colors. Thank you for being such a wonderful soul.",
+            "You've worked hard all year. Now it's time to rest and be kind to yourself. You deserve all the peace in the world.",
+            "Sending you a warm hug through this message. You are enough, just as you are.",
+            "May your heart be filled with quiet joy and beautiful moments this season. Keep shining your soft light.",
+            "Wishing you a Christmas full of soft smiles and cozy blankets. You are doing amazing!",
+            "Be proud of how far you've come. You are a gift to everyone who knows you. Happy Holidays!"
+        ];
+
+        function openCard() {
+            const randomIndex = Math.floor(Math.random() * wishes.length);
+            const messageBox = document.getElementById('wish-text');
+            messageBox.innerHTML = `<p>${wishes[randomIndex]}</p>`;
+            document.getElementById('page1').classList.add('hidden');
+            setTimeout(() => { messageBox.classList.add('show-text'); }, 500);
+        }
+
+        function closeCard() {
+            const messageBox = document.getElementById('wish-text');
+            messageBox.classList.remove('show-text');
+            document.getElementById('page1').classList.remove('hidden');
+        }
+
+        window.onload = () => {
+            createLights();
+            createSnow();
+        };
+    </script>
+</body>
+</html>
